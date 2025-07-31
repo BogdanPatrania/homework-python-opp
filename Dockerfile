@@ -1,19 +1,24 @@
-# Use official Python 3.11 slim image
+# Use official Python 3.11 image
 FROM python:3.11-slim
 
-# Set work directory inside the container
+# Set working directory inside container
 WORKDIR /app
 
-# Copy requirements and install dependencies
-COPY requirements.txt .
+# Copy project metadata
+COPY pyproject.toml ./
 
-RUN pip install --no-cache-dir -r requirements.txt
+# Optional: copy setup.py if using both
+COPY setup.py ./
 
-# Copy the rest of the code into the container
+# Install build backend and project dependencies
+RUN pip install --upgrade pip setuptools wheel
+RUN pip install .
+
+# Copy the rest of your application code
 COPY . .
 
-# Expose the app on port 8000
+# Expose port for FastAPI
 EXPOSE 8000
 
-# Default command to run the FastAPI app
+# Run FastAPI app
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

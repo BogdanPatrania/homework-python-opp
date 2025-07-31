@@ -26,6 +26,8 @@ A lightweight FastAPI-based microservice for mathematical operations, featuring:
 - **Click** – CLI interface
 - **pytest** – automated testing
 - **Python 3.11+**
+- **Docker** – containerization
+- **Makefile** – developer automation
 
 ---
 
@@ -39,6 +41,7 @@ A lightweight FastAPI-based microservice for mathematical operations, featuring:
 - `/tasks` dashboard to view all background jobs and their status/results
 - CLI interface for running operations and exporting history
 - Flake8 linted and readable code
+- Docker and Docker Compose support for easy deployment
 
 ---
 
@@ -46,6 +49,12 @@ A lightweight FastAPI-based microservice for mathematical operations, featuring:
 
 ### 1. Install dependencies
 
+You can install dependencies using either `pip` or the build system:
+
+```bash
+pip install -e .
+```
+or
 ```bash
 pip install -r requirements.txt
 ```
@@ -63,13 +72,51 @@ uvicorn main:app --reload
 - History UI: [http://localhost:8000/history](http://localhost:8000/history)
 - Tasks Dashboard: [http://localhost:8000/tasks](http://localhost:8000/tasks)
 
-### 4. Run from the command line
+### 4. Run from the command line (CLI)
+
+The CLI is implemented in the `cli/` package and registered as `mathcli` via `setup.py`.  
+You can run it with:
 
 ```bash
-python cli.py pow --base 2 --exp 10
-python cli.py fibonacci --n 1000
-python cli.py factorial --n 2000
-python cli.py export --operation all
+python -m cli.main pow --base 2 --exp 10
+python -m cli.main fibonacci --n 1000
+python -m cli.main factorial --n 2000
+python -m cli.main export --operation all
+python -m cli.main status --task-id <task_id>
+```
+
+Or, if installed as a package:
+
+```bash
+mathcli pow --base 2 --exp 10
+```
+
+---
+
+## Makefile
+
+A `Makefile` is provided for common developer tasks:
+
+```makefile
+run:        # Start FastAPI with reload
+cli:        # Run the CLI
+test:       # Run all tests
+lint:       # Run flake8 linter
+docker:     # Build Docker image
+compose:    # Run docker-compose up --build
+clean:      # Remove .pyc and __pycache__ files
+```
+
+Example usage:
+
+```bash
+make run
+make cli
+make test
+make lint
+make docker
+make compose
+make clean
 ```
 
 ---
@@ -202,15 +249,21 @@ Response:
 ```text
 .
 ├── main.py                         # FastAPI app entry point
-├── cli.py                          # Command-line interface
+├── cli/
+│   ├── __init__.py
+│   ├── main.py                     # CLI entry point
+│   └── commands/                   # CLI commands (pow_cmd.py, fibonacci_cmd.py, etc.)
 ├── requirements.txt                # Python dependencies
+├── pyproject.toml                  # PEP 517/518 build config
+├── setup.py                        # setuptools config and CLI entry point
+├── Makefile                        # Developer automation
+├── Dockerfile                      # Docker build instructions
+├── docker-compose.yml              # Docker Compose config
+├── .dockerignore                   # Docker ignore rules
 ├── .flake8                         # Linter configuration
 ├── .gitignore                      # Git ignore rules
 ├── README.md                       # This file
 ├── test.sh                         # Shell script to run all tests
-├── Dockerfile                      # Docker build instructions
-├── docker-compose.yml              # Docker Compose config
-├── .dockerignore                   # Docker ignore rules
 ├── api/
 │   ├── __init__.py
 │   └── routes.py                   # API + /history route
@@ -234,5 +287,5 @@ Response:
 ├── tests/
 │   ├── test_math_ops.py            # Unit tests for math functions
 │   ├── test_cli.py                 # CLI command tests
-│   └── test_api.py
+│   └── test_api.py                 # API
 ```

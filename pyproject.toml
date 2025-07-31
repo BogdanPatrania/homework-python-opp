@@ -1,0 +1,19 @@
+[project]
+name = "math-microservice"
+version = "1.0.0"
+description = "FastAPI math microservice with CLI and background task support"
+requires-python = ">=3.11"
+
+[project.dependencies]
+fastapi = "*"
+uvicorn = { extras = ["standard"] }
+jinja2 = "*"
+click = "*"
+pydantic = "*"
+httpx = "*"
+pytest = "*"
+anyio = "*"
+flake8 = "*"
+
+[tool.setuptools]
+packages = ["cli", "services", "api", "models", "storage"]
