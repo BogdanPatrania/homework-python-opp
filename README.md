@@ -2,22 +2,16 @@
 
 ## Description
 
-This project is a lightweight FastAPI-based microservice that performs mathematical operations through a REST API, a responsive Bootstrap-based frontend, and a command-line interface (CLI).
+A lightweight FastAPI-based microservice for mathematical operations, featuring:
+- REST API, responsive Bootstrap frontend, and CLI
+- Smart background processing for heavy computations
+- Persistent SQLite storage for requests and background tasks
+- Dark mode, animated UI, and mobile responsiveness
 
-### Supported operations:
+### Supported Operations
 - `pow(base, exponent)` – exponentiation
 - `fibonacci(n)` – nth Fibonacci number
 - `factorial(n)` – factorial of n
-
-The app includes:
-- A dark-mode-enabled frontend
-- SQLite-backed request logging
-- Real-time filtering of request history
-- Input/output validation using **Pydantic**
-- Smart background processing for heavy inputs (fibonacci, factorial, pow)
-- `/status/{task_id}` endpoint to track async computations
-- `/tasks` dashboard to view all background jobs
-- CLI interface using `click` (run operations or export history via terminal)
 
 ---
 
@@ -29,28 +23,22 @@ The app includes:
 - **SQLite** – persistent request storage
 - **Bootstrap 5** – modern, responsive UI
 - **flake8** – code style checker
-- **HTML/CSS/JS** – with dark mode support
-- **Python 3.11+**
 - **Click** – CLI interface
-- **Separate SQLite database for tracking background task metadata and results**
+- **pytest** – automated testing
+- **Python 3.11+**
 
 ---
 
 ## Features
 
 - REST API: `/pow`, `/fibonacci`, `/factorial`
-- Web UI with animated results and mobile responsiveness
+- Web UI with dark mode and animations
 - SQLite request storage (operation, input, result, timestamp)
-- `/history` page:
-  - View all / last 10 / filter by operation
-  - Dynamic dropdown appears when needed
+- `/history` page: view all, last 10, or filter by operation
 - `/status/{task_id}` endpoint to track async computations
 - `/tasks` dashboard to view all background jobs and their status/results
-- Smart background processing for heavy computations (offloads large jobs to background tasks)
 - CLI interface for running operations and exporting history
-- Dark mode toggle (persistent across pages)
 - Flake8 linted and readable code
-- Google Fonts (`Inter`) and animated UI elements
 
 ---
 
@@ -70,10 +58,10 @@ uvicorn main:app --reload
 
 ### 3. Use the app
 
-- Web UI: http://localhost:8000
-- API Docs (Swagger): http://localhost:8000/docs
-- History UI: http://localhost:8000/history
-- Tasks Dashboard: http://localhost:8000/tasks
+- Web UI: [http://localhost:8000](http://localhost:8000)
+- API Docs (Swagger): [http://localhost:8000/docs](http://localhost:8000/docs)
+- History UI: [http://localhost:8000/history](http://localhost:8000/history)
+- Tasks Dashboard: [http://localhost:8000/tasks](http://localhost:8000/tasks)
 
 ### 4. Run from the command line
 
@@ -105,6 +93,41 @@ PYTHONPATH=. pytest
 - `tests/test_math_ops.py`: Unit tests for math functions
 - `tests/test_cli.py`: CLI command tests
 - `tests/test_api.py`: API endpoint tests using FastAPI's TestClient
+
+---
+
+## Running with Docker
+
+You can run this app in a container using Docker or Rancher Desktop.
+
+### 1. Build the Docker image
+
+```bash
+docker build -t math-microservice .
+```
+
+### 2. Run the container
+
+```bash
+docker run -d -p 8000:8000 --name math-api math-microservice
+```
+
+- The app will be available at [http://localhost:8000](http://localhost:8000)
+- Swagger docs: [http://localhost:8000/docs](http://localhost:8000/docs)
+
+### 3. (Optional) Clean up
+
+To stop and remove the container:
+
+```bash
+docker stop math-api
+docker rm math-api
+```
+
+### 4. Development tips
+
+- The `.dockerignore` file is set up to keep your images small and clean.
+- For persistent SQLite storage or development with live code reload, consider using Docker volumes or `docker-compose`.
 
 ---
 
@@ -146,6 +169,13 @@ Response:
 
 ---
 
+## Notes
+
+- Built as part of a technical assignment. Background tasks were implemented using FastAPI’s `BackgroundTasks` with SQLite persistence for tracking. Large number safety (Python 3.11 digit limits) is handled gracefully.
+- The CLI allows you to run operations and export history directly from the terminal.
+
+---
+
 ## Project Structure
 
 ```text
@@ -182,43 +212,3 @@ Response:
 │   ├── test_cli.py                 # CLI command tests
 │   └── test_api.py                 # API
 ```
-
----
-
-## Notes
-
-- Built as part of a technical assignment. Background tasks were implemented using FastAPI’s `BackgroundTasks` with SQLite persistence for tracking. Large number safety (Python 3.11 digit limits) is handled gracefully.
-- The CLI allows you to run operations and export history directly from the terminal.
-
-
-## How to Run
-
-### 1. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 2. Start the FastAPI service
-
-```bash
-uvicorn main:app --reload
-```
-
-### 3. Use the app
-
-- Web UI: http://localhost:8000
-- API Docs (Swagger): http://localhost:8000/docs
-- History UI: http://localhost:8000/history
-- Tasks Dashboard: http://localhost:8000/tasks
-
-### 4. Run from the command line
-
-```bash
-python cli.py pow --base 2 --exp 10
-python cli.py fibonacci --n 1000
-python cli.py factorial --n 2000
-python cli.py export --operation all
-```
-
----
