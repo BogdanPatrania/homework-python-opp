@@ -131,6 +131,27 @@ docker rm math-api
 
 ---
 
+## Running with Docker Compose
+
+For persistent storage and easier management, use Docker Compose:
+
+### 1. Start the app with Docker Compose
+
+```bash
+docker-compose up --build
+```
+
+- This will build the image and start the service.
+- The `storage/` directory is mounted as a volume, so your SQLite database files persist across restarts.
+
+### 2. Stop the app
+
+```bash
+docker-compose down
+```
+
+---
+
 ## Example API Usage
 
 ### POST /pow
@@ -187,6 +208,9 @@ Response:
 ├── .gitignore                      # Git ignore rules
 ├── README.md                       # This file
 ├── test.sh                         # Shell script to run all tests
+├── Dockerfile                      # Docker build instructions
+├── docker-compose.yml              # Docker Compose config
+├── .dockerignore                   # Docker ignore rules
 ├── api/
 │   ├── __init__.py
 │   └── routes.py                   # API + /history route
@@ -210,5 +234,5 @@ Response:
 ├── tests/
 │   ├── test_math_ops.py            # Unit tests for math functions
 │   ├── test_cli.py                 # CLI command tests
-│   └── test_api.py                 # API
+│   └── test_api.py
 ```
