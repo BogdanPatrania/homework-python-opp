@@ -104,18 +104,23 @@
 </head>
 <body>
 
-<!-- Dark Mode Toggle -->
-<div class="toggle-switch">
-    <button class="btn btn-sm btn-light" onclick="toggleDarkMode()">🌓 Toggle Dark Mode</button>
+<!-- Top-right button bar -->
+<div class="position-absolute top-0 end-0 mt-3 me-3 d-flex flex-row gap-2">
+    <button class="btn btn-sm btn-light" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+    <a href="/history" class="btn btn-sm btn-light">View History</a>
+    {% if not op_type %}
+    <button class="btn btn-sm btn-light invisible" tabindex="-1" aria-hidden="true"></button>
+    {% endif %}
 </div>
 
 <div class="container py-5 d-flex flex-column justify-content-center min-vh-100">
-    <h1 class="text-center mb-4">Math Microservice</h1>
-
+    <div class="mt-5 mb-4 px-3 text-center">
+        <h1 class="fw-bold">Math Microservice</h1>
+    </div>
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <form method="post" class="card p-4 shadow-lg">
-                <div class="mb-3">
+            <form method="post" class="card p-4 shadow-lg d-flex flex-column gap-3">
+                <div>
                     <label for="op_type" class="form-label">Choose operation</label>
                     <select class="form-select" name="op_type" id="op_type" required>
                         <option value="pow" {% if op_type == "pow" %}selected{% endif %}>Power (a ^ b)</option>
@@ -124,12 +129,12 @@
                     </select>
                 </div>
 
-                <div class="mb-3">
+                <div>
                     <label for="a" class="form-label">Value A</label>
                     <input type="number" class="form-control" name="a" id="a" required placeholder="Enter base or n">
                 </div>
 
-                <div class="mb-3" id="b_field">
+                <div id="b_field">
                     <label for="b" class="form-label">Value B (only for Power)</label>
                     <input type="number" class="form-control" name="b" id="b" placeholder="Enter exponent">
                 </div>

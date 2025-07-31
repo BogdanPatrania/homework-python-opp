@@ -2,105 +2,127 @@
 
 ## Description
 
-This project is a lightweight Python-based microservice that performs common mathematical operations via a RESTful API and a responsive frontend:
+This project is a lightweight FastAPI-based microservice that performs mathematical operations through a REST API and a responsive Bootstrap-based frontend.
 
-- `pow(base, exponent)` – computes base raised to the exponent
-- `fibonacci(n)` – computes the nth Fibonacci number
-- `factorial(n)` – computes the factorial of n
+### Supported operations:
+- `pow(base, exponent)` – exponentiation
+- `fibonacci(n)` – nth Fibonacci number
+- `factorial(n)` – factorial of n
 
-The service includes both an API and a Bootstrap-powered web UI. All incoming requests and computed results are stored in memory (dictionary-based), and inputs/outputs are validated with **Pydantic**.
+The app includes:
+- A dark-mode-enabled frontend
+- SQLite-backed request logging
+- Real-time filtering of request history
+- Input/output validation using **Pydantic**
 
 ---
 
 ## Technologies Used
 
-- **FastAPI** – web microframework
-- **Pydantic** – input/output validation
-- **Jinja2** – for HTML templates
-- **Bootstrap 5** – modern, responsive UI styling
-- **flake8** – for clean, PEP8-compliant code
-- **HTML/CSS/JS** – with gradient theming and dark mode
+- **FastAPI** – web API framework
+- **Pydantic** – validation and serialization
+- **Jinja2** – HTML templates
+- **SQLite** – persistent request storage
+- **Bootstrap 5** – modern, responsive UI
+- **flake8** – code style checker
+- **HTML/CSS/JS** – with dark mode support
 - **Python 3.11+**
 
 ---
 
 ## Features
 
-- REST API endpoints (`/pow`, `/fibonacci`, `/factorial`)
-- Simple in-memory database (Python list/dict)
-- Responsive **web frontend** with form input
-- Toggleable **Dark Mode** with gradient backgrounds
-- Clean, animated result display
-- Input validation with Pydantic
-- Code linted with flake8
-- Modern UI using Google Fonts (`Inter`)
+- REST API: `/pow`, `/fibonacci`, `/factorial`
+- Web UI with animated results and mobile responsiveness
+- SQLite request storage (operation, input, result, timestamp)
+- `/history` page:
+  - View all / last 10 / filter by operation
+  - Dynamic dropdown appears when needed
+- Dark mode toggle (persistent across pages)
+- Flake8 linted and readable code
+- Google Fonts (`Inter`) and animated UI elements
 
 ---
 
 ## How to Run
 
-### 1. Install Dependencies
+### 1. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
-### 2. Start the Service
+
+### 2. Start the FastAPI service
 
 ```bash
 uvicorn main:app --reload
 ```
 
-### 3. Open the Web UI
+### 3. Use the app
 
-Visit: http://localhost:8000
-Or try the interactive API docs at: http://localhost:8000/docs
+- Web UI: http://localhost:8000
+- API Docs (Swagger): http://localhost:8000/docs
+- History UI: http://localhost:8000/history
 
-## Example API Calls
+---
+
+## Example API Usage
 
 ### POST /pow
+
+Request:
 ```json
 {
-    "base": 2,
-    "exponent": 5
+  "base": 2,
+  "exponent": 3
 }
 ```
-### Response /pow
+Response:
 ```json
 {
-    "result": 32.0
+  "result": 8.0
 }
 ```
 
 ### GET /fibonacci?n=10
+
+Response:
 ```json
 {
-    "result": 55
+  "result": 55
 }
 ```
 
 ### GET /factorial?n=5
+
+Response:
 ```json
 {
-    "result": 120
+  "result": 120
 }
 ```
+
+---
 
 ## Project Structure
 
 ```text
 math_microservice/
-├── main.py                         # Entry point – FastAPI app with routing
+├── main.py                         # FastAPI app entry point
 ├── api/
-│   └── routes.py                   # API endpoints for pow, fibonacci, factorial
+│   └── routes.py                   # API + /history route
 ├── models/
-│   ├── request_models.py           # Pydantic input models
-│   └── response_models.py          # Pydantic response models
+│   ├── request_models.py           # Pydantic input schemas
+│   └── response_models.py          # Pydantic output schemas
 ├── services/
-│   └── math_ops.py                 # Core math logic
+│   └── math_ops.py                 # Core calculation logic
 ├── storage/
-│   └── memory_store.py             # In-memory request/result storage
+│   ├── memory_store.py             # (Legacy) in-memory store
+│   └── sqlite_store.py             # SQLite-based persistent store
 ├── templates/
-│   └── index.html                  # Jinja2 template for web UI
-├── requirements.txt                # Project dependencies
-├── .flake8                         # Flake8 config for linting
-├── README.md                       # Project documentation
+│   ├── index.html                  # Web form UI
+│   └── history.html                # Request history UI
+├── requirements.txt                # Python dependencies
+├── .flake8                         # Linter configuration
+├── README.md                       # This file
+```

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Request History</title>
+
+  <!-- Apply dark mode instantly -->
+  <script>
+    if (localStorage.getItem("darkMode") === "true") {
+      document.documentElement.classList.add("dark-mode");
+    }
+  </script>
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    rel="icon"
+    href="https://cdn-icons-png.flaticon.com/512/2721/2721292.png"
+    type="image/png"
+  />
+
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #ff6f61, #ffb347);
+      --card-bg: #ffffff;
+      --text-color: #212529;
+      --btn-color: #d63384;
+    }
+
+    html.dark-mode {
+      --bg-gradient: linear-gradient(135deg, #141e30, #243b55);
+      --card-bg: #1e1e1e;
+      --text-color: #f8f9fa;
+      --btn-color: #6f42c1;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      min-height: 100vh;
+      background: var(--bg-gradient);
+      color: var(--text-color);
+      transition: background 0.5s, color 0.5s;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      border: none;
+      border-radius: 1rem;
+    }
+
+    .form-label {
+      font-weight: 600;
+    }
+
+    .btn-primary {
+      background-color: var(--btn-color);
+      border-color: var(--btn-color);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.8s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Fixed top-right button bar */
+    .top-buttons {
+      position: sticky;
+      top: 0;
+      right: 0;
+      z-index: 1000;
+      background: var(--bg-gradient);
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    td.truncate {
+      max-width: 200px;
+      overflow-x: auto;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      cursor: pointer;
+    }
+  </style>
+
+  <script>
+    function toggleDarkMode() {
+      document.documentElement.classList.toggle("dark-mode");
+      const isDark = document.documentElement.classList.contains("dark-mode");
+      localStorage.setItem("darkMode", isDark ? "true" : "false");
+    }
+  </script>
+</head>
+<body>
+  <!-- Top-right sticky button bar -->
+  <div class="top-buttons d-flex flex-row gap-2 justify-content-end">
+    <button class="btn btn-sm btn-light" onclick="toggleDarkMode()">
+      Toggle Dark Mode
+    </button>
+    <a href="/" class="btn btn-sm btn-light">Back to Calculator</a>
+    <a href="/history/export" class="btn btn-sm btn-light">Export as CSV</a>
+  </div>
+
+  <div class="container py-5 d-flex flex-column justify-content-center min-vh-100">
+    <!-- Page Title -->
+    <div class="mt-5 mb-4 px-3 text-center">
+      <h2 class="fw-bold">Request History</h2>
+    </div>
+
+    <!-- Filter Form in Card -->
+    <div class="card p-3 mb-4">
+      <form class="d-flex flex-column gap-3" method="get" action="/history" id="filter-form">
+        <div>
+          <label class="form-label">Mode</label>
+          <select name="mode" id="mode-select" class="form-select">
+            <option value="all" {% if mode == "all" %}selected{% endif %}>
+              Show all
+            </option>
+            <option value="last10" {% if mode == "last10" %}selected{% endif %}>
+              Show last 10
+            </option>
+            <option value="filter" {% if mode == "filter" %}selected{% endif %}>
+              Filter by operation
+            </option>
+          </select>
+        </div>
+        <div class="d-none" id="operation-filter">
+          <label class="form-label">Operation</label>
+          <select name="operation" class="form-select" id="operation-select">
+            <option value="">-- Select operation --</option>
+            <option value="pow" {% if operation == "pow" %}selected{% endif %}>
+              Power
+            </option>
+            <option value="fibonacci" {% if operation == "fibonacci" %}selected{% endif %}>
+              Fibonacci
+            </option>
+            <option value="factorial" {% if operation == "factorial" %}selected{% endif %}>
+              Factorial
+            </option>
+          </select>
+        </div>
+        <div>
+          <button type="submit" class="btn btn-primary w-100" id="apply-filter-btn">Apply Filter</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Results Table -->
+    {% if history %}
+    <div class="table-responsive fade-in">
+      <table class="table table-bordered table-hover align-middle">
+        <thead class="table-dark text-center">
+          <tr>
+            <th>ID</th>
+            <th>Operation</th>
+            <th>Input</th>
+            <th>Result</th>
+            <th>Timestamp</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in history %}
+          <tr>
+            <td>{{ entry[0] }}</td>
+            <td>{{ entry[1] }}</td>
+            <td class="truncate" title="{{ entry[2] }}">{{ entry[2] }}</td>
+            <td class="truncate" title="{{ entry[3] }}">{{ entry[3] }}</td>
+            <td>{{ entry[4] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="alert alert-warning text-center mt-4">No records found.</div>
+    {% endif %}
+  </div>
+
+  <!-- Show/hide operation dropdown based on selected mode & disable Apply Filter if needed -->
+  <script>
+    const modeSelect = document.getElementById("mode-select");
+    const operationFilter = document.getElementById("operation-filter");
+    const operationSelect = document.getElementById("operation-select");
+    const applyButton = document.getElementById("apply-filter-btn");
+
+    function updateOperationFilterVisibility() {
+      if (modeSelect.value === "filter") {
+        operationFilter.classList.remove("d-none");
+      } else {
+        operationFilter.classList.add("d-none");
+        if (operationSelect) operationSelect.selectedIndex = 0;
+      }
+      updateApplyButtonState();
+    }
+
+    function updateApplyButtonState() {
+      if (modeSelect.value === "filter") {
+        applyButton.disabled = operationSelect.value === "";
+      } else {
+        applyButton.disabled = false;
+      }
+    }
+
+    if (modeSelect && operationFilter && applyButton && operationSelect) {
+      modeSelect.addEventListener("change", updateOperationFilterVisibility);
+      operationSelect.addEventListener("change", updateApplyButtonState);
+      // Show/hide on page load based on current selection
+      updateOperationFilterVisibility();
+    }
+  </script>
+</body>
+</html>
