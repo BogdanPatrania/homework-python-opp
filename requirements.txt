@@ -1,7 +1,10 @@
 fastapi
 uvicorn
 pydantic
-flake8
 jinja2
 python-multipart
 requests
+click
+flake8
+pytest
+pytest-cov
