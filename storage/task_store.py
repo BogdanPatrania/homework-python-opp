@@ -1,6 +1,6 @@
 import sqlite3
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, UTC
 from math import log10
 
 DB_FILE = Path("storage") / "background_tasks.db"
@@ -23,7 +23,8 @@ def save_task(task_id, operation, input_data):
         conn.execute("""
             INSERT INTO tasks (task_id, operation, input_data, status, created_at)
             VALUES (?, ?, ?, 'queued', ?)
-        """, (task_id, operation, str(input_data), datetime.utcnow().isoformat()))
+        """, (task_id, operation, str(input_data), datetime.now(UTC).isoformat()
+))
 
 def update_task_status(task_id, status):
     with sqlite3.connect(DB_FILE) as conn:

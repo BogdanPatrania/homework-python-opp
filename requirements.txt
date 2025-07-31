@@ -4,3 +4,4 @@ pydantic
 flake8
 jinja2
 python-multipart
+requests

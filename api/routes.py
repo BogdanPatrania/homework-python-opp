@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, BackgroundTasks, Query, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -16,8 +17,8 @@ templates = Jinja2Templates(directory="templates")
 @router.post("/pow", response_model=ResultResponse)
 def pow_endpoint(req: PowRequest):
     result = compute_pow(req.base, req.exponent)
-    store_request("pow", req.dict(), result)
-    store_request_sqlite("pow", req.dict(), result)
+    store_request("pow", req.model_dump(), result)
+    store_request_sqlite("pow", req.model_dump(), result)
     return {"result": result}
 
 
@@ -26,8 +27,9 @@ def fibonacci_endpoint(
     n: int = Query(..., ge=0),
     background_tasks: BackgroundTasks = None
 ):
-    background_tasks.add_task(store_and_compute_fibonacci, n)
-    return {"result": f"Calculating Fibonacci({n}) in background..."}
+    task_id = str(uuid.uuid4())
+    background_tasks.add_task(store_and_compute_fibonacci, n, task_id)
+    return {"result": f"Task {task_id} started: Calculating Fibonacci({n}) in background... Check status at /status/{task_id}"}
 
 
 @router.get("/factorial", response_model=ResultResponse)
@@ -52,9 +54,12 @@ def view_history(
     else:
         history = all_history
 
-    return templates.TemplateResponse("history.html", {
-        "request": request,
+    return templates.TemplateResponse(
+    request,
+    "history.html",
+    {
         "history": history,
         "mode": mode,
         "operation": operation or ""
-    })
+    }
+)

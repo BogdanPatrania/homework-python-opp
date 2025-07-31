@@ -157,4 +157,59 @@ math_microservice/
 - Built as part of a technical assignment. Background tasks were implemented using FastAPI’s `BackgroundTasks` with SQLite persistence for tracking. Large number safety (Python 3.11 digit limits) is handled gracefully.
 - The CLI allows you to run operations and export history directly from the terminal.
 
+
+## How to Run
+
+### 1. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Start the FastAPI service
+
+```bash
+uvicorn main:app --reload
+```
+
+### 3. Use the app
+
+- Web UI: http://localhost:8000
+- API Docs (Swagger): http://localhost:8000/docs
+- History UI: http://localhost:8000/history
+- Tasks Dashboard: http://localhost:8000/tasks
+
+### 4. Run from the command line
+
+```bash
+python cli.py pow --base 2 --exp 10
+python cli.py fibonacci --n 1000
+python cli.py factorial --n 2000
+python cli.py export --operation all
+```
+
 ---
+
+## Running Tests
+
+Automated tests are provided for the core math logic, CLI, and API endpoints.
+
+### Run all tests
+
+```bash
+./test.sh
+```
+or
+```bash
+PYTHONPATH=. pytest
+```
+
+### Test coverage
+
+- `tests/test_math_ops.py`: Unit tests for math functions
+- `tests/test_cli.py`: CLI command tests
+- `tests/test_api.py`: API endpoint tests using FastAPI's TestClient
+
+---
+
+## Example API Usage

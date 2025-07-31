@@ -38,7 +38,7 @@ def summarize_result(result: int | float | str) -> str:
 
 @app.get("/", response_class=HTMLResponse)
 def get_form(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(request, "index.html", {})
 
 @app.post("/", response_class=HTMLResponse)
 def post_form(
@@ -91,11 +91,14 @@ def post_form(
     else:
         result = "Invalid operation"
 
-    return templates.TemplateResponse("index.html", {
-        "request": request,
+    return templates.TemplateResponse(
+    request,
+    "index.html",
+    {
         "result": summarize_result(result),
         "op_type": op_type
-    })
+    }
+)
 
 @app.get("/history/export")
 def export_history():
@@ -122,4 +125,8 @@ def get_task_status(task_id: str):
 @app.get("/tasks", response_class=HTMLResponse)
 def view_tasks(request: Request):
     tasks = get_all_tasks()
-    return templates.TemplateResponse("tasks.html", {"request": request, "tasks": tasks})
+    return templates.TemplateResponse(
+        request,
+        "tasks.html",
+        {"tasks": tasks}
+    )
