@@ -72,6 +72,18 @@
             top: 20px;
             right: 30px;
         }
+
+        .result-box {
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-width: 100%;
+            overflow-x: auto;
+            font-family: 'Inter', monospace;
+            font-size: 1.1em;
+            background: none;
+            border: none;
+            padding: 0;
+        }
     </style>
 
     <script>
@@ -143,8 +155,9 @@
             </form>
 
             {% if result is defined %}
-            <div class="alert alert-light mt-4 text-center shadow-sm fade-in" role="alert">
-                <h4 class="mb-0 text-dark">Result: <strong>{{ result }}</strong></h4>
+            <div class="alert alert-light mt-4 text-center shadow-sm fade-in" role="alert" style="overflow-x:auto;">
+                <h4 class="mb-0 text-dark">Result:</h4>
+                <pre class="result-box" ...>{{ result | safe }}</pre>
             </div>
             {% endif %}
         </div>

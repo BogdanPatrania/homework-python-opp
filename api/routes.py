@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, BackgroundTasks, Query, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from models.request_models import PowRequest
 from models.response_models import ResultResponse
 from services.math_ops import compute_pow, compute_fibonacci, compute_factorial
+from services.background_tasks import store_and_compute_fibonacci
 from storage.memory_store import store_request
 from storage.sqlite_store import store_request_sqlite, get_all_requests_sqlite
 
@@ -21,11 +22,12 @@ def pow_endpoint(req: PowRequest):
 
 
 @router.get("/fibonacci", response_model=ResultResponse)
-def fibonacci_endpoint(n: int = Query(..., ge=0)):
-    result = compute_fibonacci(n)
-    store_request("fibonacci", {"n": n}, result)
-    store_request_sqlite("fibonacci", {"n": n}, result)
-    return {"result": result}
+def fibonacci_endpoint(
+    n: int = Query(..., ge=0),
+    background_tasks: BackgroundTasks = None
+):
+    background_tasks.add_task(store_and_compute_fibonacci, n)
+    return {"result": f"Calculating Fibonacci({n}) in background..."}
 
 
 @router.get("/factorial", response_model=ResultResponse)

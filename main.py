@@ -1,12 +1,18 @@
 import io
 import csv
-from fastapi import FastAPI, Request, Form
+import uuid
+from fastapi import FastAPI, Request, Form, BackgroundTasks
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from api.routes import router
 from services.math_ops import compute_pow, compute_fibonacci, compute_factorial
 from storage.sqlite_store import init_db, store_request_sqlite, get_all_requests_sqlite
+from services.background_tasks import store_and_compute_fibonacci, store_and_compute_factorial, store_and_compute_pow
+from storage.task_status import get_result, get_status, set_status
+from math import log10
 
+import sys
+sys.set_int_max_str_digits(25000)
 
 init_db()
 
@@ -16,37 +22,79 @@ app.include_router(router)
 
 templates = Jinja2Templates(directory="templates")
 
+MAX_DISPLAY_DIGITS = 300
+
+def summarize_result(result: int | float | str) -> str:
+    try:
+        s = str(result)
+        if len(s) > MAX_DISPLAY_DIGITS:
+            return f"{s[:MAX_DISPLAY_DIGITS]}... [{len(s)} digits total]"
+        return s
+    except Exception:
+        return "[unrepresentable result]"
+
 
 @app.get("/", response_class=HTMLResponse)
 def get_form(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-
 @app.post("/", response_class=HTMLResponse)
 def post_form(
     request: Request,
+    background_tasks: BackgroundTasks,
     op_type: str = Form(...),
     a: int = Form(0),
     b: int = Form(0)
 ):
     if op_type == "pow":
-        result = compute_pow(a, b)
-        store_request_sqlite("pow", {"base": a, "exponent": b}, result)
+        # Estimate digit count for a ** b
+        if a > 0 and b > 0:
+            est_digits = int(b * log10(a)) + 1
+        else:
+            est_digits = 1
+        if est_digits < 3000:
+            result = compute_pow(a, b)
+            store_request_sqlite("pow", {"base": a, "exponent": b}, result)
+        else:
+            task_id = str(uuid.uuid4())
+            set_status(task_id, "queued")
+            background_tasks.add_task(store_and_compute_pow, a, b, task_id)
+            result = (
+                f"Task {task_id} started: Calculating {a}^{b} (~{est_digits} digits) in background... "
+                f'<a href="/status/{task_id}" target="_blank" class="btn btn-sm btn-outline-info mt-1">Check status</a>'
+            )
 
     elif op_type == "fibonacci":
-        result = compute_fibonacci(a)
-        store_request_sqlite("fibonacci", {"n": a}, result)
+        if a < 5000:
+            result = compute_fibonacci(a)
+            store_request_sqlite("fibonacci", {"n": a}, result)
+        else:
+            task_id = str(uuid.uuid4())
+            set_status(task_id, "queued")
+            background_tasks.add_task(store_and_compute_fibonacci, a, task_id)
+            result = (
+                f"Task {task_id} started: Calculating Fibonacci({a}) in background... "
+                f'<a href="/status/{task_id}" target="_blank" class="btn btn-sm btn-outline-info mt-1">Check status</a>'
+            )
 
     elif op_type == "factorial":
-        result = compute_factorial(a)
-        store_request_sqlite("factorial", {"n": a}, result)
-
+        if a < 3000:
+            result = compute_factorial(a)
+            store_request_sqlite("factorial", {"n": a}, result)
+        else:
+            task_id = str(uuid.uuid4())
+            set_status(task_id, "queued")
+            background_tasks.add_task(store_and_compute_factorial, a, task_id)
+            result = (
+                f"Task {task_id} started: Calculating Factorial({a}) in background... "
+                f'<a href="/status/{task_id}" target="_blank" class="btn btn-sm btn-outline-info mt-1">Check status</a>'
+            )
     else:
         result = "Invalid operation"
 
     return templates.TemplateResponse("index.html", {
         "request": request,
-        "result": result,
+        "result": summarize_result(result),
         "op_type": op_type
     })
 
@@ -63,3 +111,14 @@ def export_history():
         media_type="text/csv",
         headers={"Content-Disposition": "attachment; filename=history.csv"}
     )
+
+
+@app.get("/status/{task_id}")
+def get_task_status(task_id: str):
+    status = get_status(task_id)
+    result = get_result(task_id)
+    return {
+        "task_id": task_id,
+        "status": status,
+        "result": result
+    }
