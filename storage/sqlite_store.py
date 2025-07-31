@@ -53,12 +53,3 @@ def get_all_requests_sqlite():
             ORDER BY timestamp DESC
         """)
         return cursor.fetchall()
-    
-def get_all_requests_sqlite():
-    with sqlite3.connect(DB_FILE) as conn:
-        cursor = conn.execute("""
-            SELECT id, operation, input_data, result, timestamp
-            FROM requests
-            ORDER BY timestamp DESC
-        """)
-        return cursor.fetchall()

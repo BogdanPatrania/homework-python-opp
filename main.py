@@ -8,13 +8,15 @@ from api.routes import router
 from services.math_ops import compute_pow, compute_fibonacci, compute_factorial
 from storage.sqlite_store import init_db, store_request_sqlite, get_all_requests_sqlite
 from services.background_tasks import store_and_compute_fibonacci, store_and_compute_factorial, store_and_compute_pow
-from storage.task_status import get_result, get_status, set_status
 from math import log10
+from storage.task_store import init_task_db, get_task, get_all_tasks
 
 import sys
+
 sys.set_int_max_str_digits(25000)
 
 init_db()
+init_task_db()
 
 
 app = FastAPI(title="Math Microservice")
@@ -57,7 +59,6 @@ def post_form(
             store_request_sqlite("pow", {"base": a, "exponent": b}, result)
         else:
             task_id = str(uuid.uuid4())
-            set_status(task_id, "queued")
             background_tasks.add_task(store_and_compute_pow, a, b, task_id)
             result = (
                 f"Task {task_id} started: Calculating {a}^{b} (~{est_digits} digits) in background... "
@@ -70,7 +71,6 @@ def post_form(
             store_request_sqlite("fibonacci", {"n": a}, result)
         else:
             task_id = str(uuid.uuid4())
-            set_status(task_id, "queued")
             background_tasks.add_task(store_and_compute_fibonacci, a, task_id)
             result = (
                 f"Task {task_id} started: Calculating Fibonacci({a}) in background... "
@@ -83,7 +83,6 @@ def post_form(
             store_request_sqlite("factorial", {"n": a}, result)
         else:
             task_id = str(uuid.uuid4())
-            set_status(task_id, "queued")
             background_tasks.add_task(store_and_compute_factorial, a, task_id)
             result = (
                 f"Task {task_id} started: Calculating Factorial({a}) in background... "
@@ -115,10 +114,12 @@ def export_history():
 
 @app.get("/status/{task_id}")
 def get_task_status(task_id: str):
-    status = get_status(task_id)
-    result = get_result(task_id)
-    return {
-        "task_id": task_id,
-        "status": status,
-        "result": result
-    }
+    task = get_task(task_id)
+    if task:
+        return task
+    return {"task_id": task_id, "status": "not found"}
+
+@app.get("/tasks", response_class=HTMLResponse)
+def view_tasks(request: Request):
+    tasks = get_all_tasks()
+    return templates.TemplateResponse("tasks.html", {"request": request, "tasks": tasks})

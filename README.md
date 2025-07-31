@@ -2,7 +2,7 @@
 
 ## Description
 
-This project is a lightweight FastAPI-based microservice that performs mathematical operations through a REST API and a responsive Bootstrap-based frontend.
+This project is a lightweight FastAPI-based microservice that performs mathematical operations through a REST API, a responsive Bootstrap-based frontend, and a command-line interface (CLI).
 
 ### Supported operations:
 - `pow(base, exponent)` – exponentiation
@@ -14,6 +14,10 @@ The app includes:
 - SQLite-backed request logging
 - Real-time filtering of request history
 - Input/output validation using **Pydantic**
+- Smart background processing for heavy inputs (fibonacci, factorial, pow)
+- `/status/{task_id}` endpoint to track async computations
+- `/tasks` dashboard to view all background jobs
+- CLI interface using `click` (run operations or export history via terminal)
 
 ---
 
@@ -27,6 +31,8 @@ The app includes:
 - **flake8** – code style checker
 - **HTML/CSS/JS** – with dark mode support
 - **Python 3.11+**
+- **Click** – CLI interface
+- **Separate SQLite database for tracking background task metadata and results**
 
 ---
 
@@ -38,6 +44,10 @@ The app includes:
 - `/history` page:
   - View all / last 10 / filter by operation
   - Dynamic dropdown appears when needed
+- `/status/{task_id}` endpoint to track async computations
+- `/tasks` dashboard to view all background jobs and their status/results
+- Smart background processing for heavy computations (offloads large jobs to background tasks)
+- CLI interface for running operations and exporting history
 - Dark mode toggle (persistent across pages)
 - Flake8 linted and readable code
 - Google Fonts (`Inter`) and animated UI elements
@@ -63,6 +73,16 @@ uvicorn main:app --reload
 - Web UI: http://localhost:8000
 - API Docs (Swagger): http://localhost:8000/docs
 - History UI: http://localhost:8000/history
+- Tasks Dashboard: http://localhost:8000/tasks
+
+### 4. Run from the command line
+
+```bash
+python cli.py pow --base 2 --exp 10
+python cli.py fibonacci --n 1000
+python cli.py factorial --n 2000
+python cli.py export --operation all
+```
 
 ---
 
@@ -118,11 +138,23 @@ math_microservice/
 │   └── math_ops.py                 # Core calculation logic
 ├── storage/
 │   ├── memory_store.py             # (Legacy) in-memory store
-│   └── sqlite_store.py             # SQLite-based persistent store
+│   ├── sqlite_store.py             # SQLite-based persistent store
+│   └── task_store.py               # Background task tracking (SQLite)
 ├── templates/
 │   ├── index.html                  # Web form UI
-│   └── history.html                # Request history UI
+│   ├── history.html                # Request history UI
+│   └── tasks.html                  # Background tasks dashboard
+├── cli.py                          # Command-line interface
 ├── requirements.txt                # Python dependencies
 ├── .flake8                         # Linter configuration
 ├── README.md                       # This file
 ```
+
+---
+
+## Notes
+
+- Built as part of a technical assignment. Background tasks were implemented using FastAPI’s `BackgroundTasks` with SQLite persistence for tracking. Large number safety (Python 3.11 digit limits) is handled gracefully.
+- The CLI allows you to run operations and export history directly from the terminal.
+
+---

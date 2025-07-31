@@ -21,6 +21,7 @@
             --card-bg: #ffffff;
             --text-color: #212529;
             --btn-color: #d63384;
+            --bar-bg: #fff8f0;
         }
 
         html.dark-mode {
@@ -28,6 +29,7 @@
             --card-bg: #1e1e1e;
             --text-color: #f8f9fa;
             --btn-color: #6f42c1;
+            --bar-bg: #23272e;
         }
 
         body {
@@ -84,6 +86,30 @@
             border: none;
             padding: 0;
         }
+
+        .top-buttons .btn {
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        border: 1px solid #e0e0e0;
+        background-color: #f8f9fa;
+        color: #212529;
+        transition: background 0.2s, color 0.2s, border 0.2s;
+        }
+        .top-buttons .btn:hover, .top-buttons .btn:focus {
+            background-color: #e9ecef;
+            color: #d63384;
+            border-color: #d63384;
+        }
+        html.dark-mode .top-buttons .btn {
+            background-color: #23272e;
+            color: #f8f9fa;
+            border: 1px solid #444950;
+        }
+        html.dark-mode .top-buttons .btn:hover, html.dark-mode .top-buttons .btn:focus {
+            background-color: #343a40;
+            color: #6f42c1;
+            border-color: #6f42c1;
+        }
     </style>
 
     <script>
@@ -116,13 +142,11 @@
 </head>
 <body>
 
-<!-- Top-right button bar -->
-<div class="position-absolute top-0 end-0 mt-3 me-3 d-flex flex-row gap-2">
+<!-- Top-right sticky button bar -->
+<div class="top-buttons d-flex flex-row gap-2 justify-content-end">
     <button class="btn btn-sm btn-light" onclick="toggleDarkMode()">Toggle Dark Mode</button>
     <a href="/history" class="btn btn-sm btn-light">View History</a>
-    {% if not op_type %}
-    <button class="btn btn-sm btn-light invisible" tabindex="-1" aria-hidden="true"></button>
-    {% endif %}
+    <a href="/tasks" class="btn btn-sm btn-light">View Tasks</a>
 </div>
 
 <div class="container py-5 d-flex flex-column justify-content-center min-vh-100">
