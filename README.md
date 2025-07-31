@@ -86,6 +86,28 @@ python cli.py export --operation all
 
 ---
 
+## Running Tests
+
+Automated tests are provided for the core math logic, CLI, and API endpoints.
+
+### Run all tests
+
+```bash
+./test.sh
+```
+or
+```bash
+PYTHONPATH=. pytest
+```
+
+### Test coverage
+
+- `tests/test_math_ops.py`: Unit tests for math functions
+- `tests/test_cli.py`: CLI command tests
+- `tests/test_api.py`: API endpoint tests using FastAPI's TestClient
+
+---
+
 ## Example API Usage
 
 ### POST /pow
@@ -127,16 +149,27 @@ Response:
 ## Project Structure
 
 ```text
-math_microservice/
+.
 ├── main.py                         # FastAPI app entry point
+├── cli.py                          # Command-line interface
+├── requirements.txt                # Python dependencies
+├── .flake8                         # Linter configuration
+├── .gitignore                      # Git ignore rules
+├── README.md                       # This file
+├── test.sh                         # Shell script to run all tests
 ├── api/
+│   ├── __init__.py
 │   └── routes.py                   # API + /history route
 ├── models/
+│   ├── __init__.py
 │   ├── request_models.py           # Pydantic input schemas
 │   └── response_models.py          # Pydantic output schemas
 ├── services/
-│   └── math_ops.py                 # Core calculation logic
+│   ├── __init__.py
+│   ├── math_ops.py                 # Core calculation logic
+│   └── background_tasks.py         # Background task logic
 ├── storage/
+│   ├── __init__.py
 │   ├── memory_store.py             # (Legacy) in-memory store
 │   ├── sqlite_store.py             # SQLite-based persistent store
 │   └── task_store.py               # Background task tracking (SQLite)
@@ -144,10 +177,10 @@ math_microservice/
 │   ├── index.html                  # Web form UI
 │   ├── history.html                # Request history UI
 │   └── tasks.html                  # Background tasks dashboard
-├── cli.py                          # Command-line interface
-├── requirements.txt                # Python dependencies
-├── .flake8                         # Linter configuration
-├── README.md                       # This file
+├── tests/
+│   ├── test_math_ops.py            # Unit tests for math functions
+│   ├── test_cli.py                 # CLI command tests
+│   └── test_api.py                 # API
 ```
 
 ---
@@ -189,27 +222,3 @@ python cli.py export --operation all
 ```
 
 ---
-
-## Running Tests
-
-Automated tests are provided for the core math logic, CLI, and API endpoints.
-
-### Run all tests
-
-```bash
-./test.sh
-```
-or
-```bash
-PYTHONPATH=. pytest
-```
-
-### Test coverage
-
-- `tests/test_math_ops.py`: Unit tests for math functions
-- `tests/test_cli.py`: CLI command tests
-- `tests/test_api.py`: API endpoint tests using FastAPI's TestClient
-
----
-
-## Example API Usage
