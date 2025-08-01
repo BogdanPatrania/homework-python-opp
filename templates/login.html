@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Background Tasks</title>
+    <title>Login | Math Microservice</title>
     <script>
         if (localStorage.getItem("darkMode") === "true") {
             document.documentElement.classList.add("dark-mode");
@@ -39,6 +39,9 @@
             border: none;
             border-radius: 1rem;
         }
+        .form-label {
+            font-weight: 600;
+        }
         .btn-primary {
             background-color: var(--btn-color);
             border-color: var(--btn-color);
@@ -54,12 +57,12 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .top-buttons .btn {
-        font-family: 'Inter', sans-serif;
-        font-weight: 600;
-        border: 1px solid #e0e0e0;
-        background-color: #f8f9fa;
-        color: #212529;
-        transition: background 0.2s, color 0.2s, border 0.2s;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border: 1px solid #e0e0e0;
+            background-color: #f8f9fa;
+            color: #212529;
+            transition: background 0.2s, color 0.2s, border 0.2s;
         }
         .top-buttons .btn:hover, .top-buttons .btn:focus {
             background-color: #e9ecef;
@@ -76,10 +79,6 @@
             color: #6f42c1;
             border-color: #6f42c1;
         }
-        .table-responsive {
-            overflow-x: auto;
-        }
-        td, th { word-break: break-all; }
     </style>
     <script>
         function toggleDarkMode() {
@@ -95,40 +94,29 @@
         <button class="btn btn-sm btn-light" onclick="toggleDarkMode()">Toggle Dark Mode</button>
         <a href="/" class="btn btn-sm btn-light">Back to Calculator</a>
         <a href="/history" class="btn btn-sm btn-light">View History</a>
+        <a href="/tasks" class="btn btn-sm btn-light">View Tasks</a>
         <a href="/logout" class="btn btn-sm btn-light">Logout</a>
     </div>
     <div class="container py-5 d-flex flex-column justify-content-center min-vh-100">
-        <div class="mt-5 mb-4 px-3 text-center">
-            <h2 class="fw-bold">Background Tasks</h2>
-        </div>
-        <div class="card p-3 fade-in">
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped table-sm align-middle mb-0">
-                    <thead class="table-dark text-center">
-                        <tr>
-                            <th>Task ID</th>
-                            <th>Operation</th>
-                            <th>Input</th>
-                            <th>Status</th>
-                            <th>Result Summary</th>
-                            <th>Link</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for task in tasks %}
-                        <tr>
-                            <td style="word-break: break-all;">{{ task.task_id }}</td>
-                            <td>{{ task.operation }}</td>
-                            <td>{{ task.input }}</td>
-                            <td>{{ task.status }}</td>
-                            <td>{{ task.result[:100] if task.result else "-" }}</td>
-                            <td>
-                                <a href="/status/{{ task.task_id }}" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card p-4 shadow-lg fade-in">
+                    <h2 class="mb-4 text-center fw-bold">Login</h2>
+                    <form method="post" action="/login" class="d-flex flex-column gap-3">
+                        <div>
+                            <label for="username" class="form-label">Username</label>
+                            <input name="username" id="username" type="text" class="form-control" placeholder="Username" required>
+                        </div>
+                        <div>
+                            <label for="password" class="form-label">Password</label>
+                            <input name="password" id="password" type="password" class="form-control" placeholder="Password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Login</button>
+                    </form>
+                    {% if error %}
+                        <div class="alert alert-danger mt-3 text-center">{{ error }}</div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>

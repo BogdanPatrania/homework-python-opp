@@ -7,6 +7,7 @@ A lightweight FastAPI-based microservice for mathematical operations, featuring:
 - Smart background processing for heavy computations
 - Persistent SQLite storage for requests and background tasks
 - Dark mode, animated UI, and mobile responsiveness
+- Session-based browser login and API key authentication
 
 ### Supported Operations
 - `pow(base, exponent)` – exponentiation
@@ -28,6 +29,8 @@ A lightweight FastAPI-based microservice for mathematical operations, featuring:
 - **Python 3.11+**
 - **Docker** – containerization
 - **Makefile** – developer automation
+- **itsdangerous** – secure session cookies
+- **dotenv** – environment variable management
 
 ---
 
@@ -42,6 +45,9 @@ A lightweight FastAPI-based microservice for mathematical operations, featuring:
 - CLI interface for running operations and exporting history
 - Flake8 linted and readable code
 - Docker and Docker Compose support for easy deployment
+- Session-based login for browser users
+- API key authentication for CLI, curl, and external clients
+- Protected `/docs`, `/history`, `/tasks` routes (redirects to `/login` if not authenticated)
 
 ---
 
@@ -68,9 +74,10 @@ uvicorn main:app --reload
 ### 3. Use the app
 
 - Web UI: [http://localhost:8000](http://localhost:8000)
-- API Docs (Swagger): [http://localhost:8000/docs](http://localhost:8000/docs)
-- History UI: [http://localhost:8000/history](http://localhost:8000/history)
-- Tasks Dashboard: [http://localhost:8000/tasks](http://localhost:8000/tasks)
+- API Docs (Swagger): [http://localhost:8000/docs](http://localhost:8000/docs) (requires login)
+- History UI: [http://localhost:8000/history](http://localhost:8000/history) (requires login)
+- Tasks Dashboard: [http://localhost:8000/tasks](http://localhost:8000/tasks) (requires login)
+- Login: [http://localhost:8000/login](http://localhost:8000/login)
 
 ### 4. Run from the command line (CLI)
 
@@ -89,6 +96,22 @@ Or, if installed as a package:
 
 ```bash
 mathcli pow --base 2 --exp 10
+```
+
+---
+
+## Authentication
+
+- **Browser:** Login at `/login` (session cookie required for protected pages)
+- **API/CLI/curl:** Use `X-API-Key` header (see `.env` for value, default: `secret123`)
+
+**Example curl:**
+
+```bash
+curl -X POST "http://localhost:8000/pow" \
+     -H "Content-Type: application/json" \
+     -H "X-API-Key: secret123" \
+     -d '{"base": 2, "exponent": 3}'
 ```
 
 ---
@@ -160,7 +183,7 @@ docker run -d -p 8000:8000 --name math-api math-microservice
 ```
 
 - The app will be available at [http://localhost:8000](http://localhost:8000)
-- Swagger docs: [http://localhost:8000/docs](http://localhost:8000/docs)
+- Swagger docs: [http://localhost:8000/docs](http://localhost:8000/docs) (requires login)
 
 ### 3. (Optional) Clean up
 
@@ -241,6 +264,7 @@ Response:
 
 - Built as part of a technical assignment. Background tasks were implemented using FastAPI’s `BackgroundTasks` with SQLite persistence for tracking. Large number safety (Python 3.11 digit limits) is handled gracefully.
 - The CLI allows you to run operations and export history directly from the terminal.
+- All sensitive endpoints are protected by session or API key authentication.
 
 ---
 
@@ -274,7 +298,8 @@ Response:
 ├── services/
 │   ├── __init__.py
 │   ├── math_ops.py                 # Core calculation logic
-│   └── background_tasks.py         # Background task logic
+│   ├── background_tasks.py         # Background task logic
+│   └── auth.py                     # Session and API key authentication
 ├── storage/
 │   ├── __init__.py
 │   ├── memory_store.py             # (Legacy) in-memory store
@@ -283,9 +308,10 @@ Response:
 ├── templates/
 │   ├── index.html                  # Web form UI
 │   ├── history.html                # Request history UI
-│   └── tasks.html                  # Background tasks dashboard
+│   ├── tasks.html                  # Background tasks dashboard
+│   └── login.html                  # Login page
 ├── tests/
 │   ├── test_math_ops.py            # Unit tests for math functions
 │   ├── test_cli.py                 # CLI command tests
-│   └── test_api.py                 # API
+│   └── test_api.py                 # API endpoint
 ```
