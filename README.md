@@ -102,7 +102,11 @@ mathcli pow --base 2 --exp 10
 
 ## Authentication
 
-- **Browser:** Login at `/login` (session cookie required for protected pages)
+- **Browser:** Login at `/login` (session cookie required for protected pages)  
+  For testing purposes, use the following credentials:  
+  - **Username:** `admin`  
+  - **Password:** `admin`
+
 - **API/CLI/curl:** Use `X-API-Key` header (see `.env` for value, default: `secret123`)
 
 **Example curl:**
