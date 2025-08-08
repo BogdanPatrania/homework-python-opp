@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+jinja2
+click
+pydantic
+httpx
+pytest
+anyio
+flake8
+python-dotenv
+itsdangerous
